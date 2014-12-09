@@ -283,7 +283,10 @@ func createTarFile(path, extractDir string, hdr *tar.Header, reader io.Reader, L
 		}
 
 		if err := system.Mknod(path, mode, int(system.Mkdev(hdr.Devmajor, hdr.Devminor))); err != nil {
-			return err
+			// Will throw warning if something is wrong
+			// But erroring out will prevent non-root users from getting archives
+			log.Warnf("Did not make special file at %s: %s", path, err)
+			return nil
 		}
 
 	case tar.TypeLink:

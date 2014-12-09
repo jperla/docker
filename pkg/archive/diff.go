@@ -82,8 +82,9 @@ func ApplyLayer(dest string, layer ArchiveReader) error {
 					}
 					defer os.RemoveAll(aufsTempdir)
 				}
-				if err := createTarFile(filepath.Join(aufsTempdir, basename), dest, hdr, tr, true); err != nil {
-					return err
+				// Need to rearchitect docker libs significantly to allow non-root users
+				if err := createTarFile(filepath.Join(aufsTempdir, basename), dest, hdr, tr, false); err != nil {
+					return fmt.Errorf("cannot create tarfile: %s", err)
 				}
 			}
 			continue
@@ -130,8 +131,9 @@ func ApplyLayer(dest string, layer ArchiveReader) error {
 				srcData = tmpFile
 			}
 
-			if err := createTarFile(path, dest, srcHdr, srcData, true); err != nil {
-				return err
+			// Need to rearchitect docker libs significantly to allow non-root users
+			if err := createTarFile(path, dest, srcHdr, srcData, false); err != nil {
+				return fmt.Errorf("cannot create: %s", err)
 			}
 
 			// Directory mtimes must be handled at the end to avoid further
